@@ -1,7 +1,7 @@
 - name: CSV File Sample
   hosts: all
   vars:
-   csv_bash_path: "/tmp"
+   csv_bash_path: "/var/lib/awx/baselinecheck"
   tasks:
     - name: Hello AWX and CSV
       debug:
