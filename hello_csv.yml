@@ -1,5 +1,7 @@
 - name: CSV File Sample
   hosts: all
+  vars:
+   csv_bash_path: "/tmp"
   tasks:
     - name: Hello AWX and CSV
       debug:
@@ -7,17 +9,17 @@
 
     - name: create directory for csv
       file:
-        path: "{{ csv_path }}"
+        path: "{{ csv_bash_path }}/{{ job_id }}"
         state: directory
 
     - name: create csv file for test
       file:
-        path: "{{ csv_path }}/{{csv_file}}.csv"
+        path: "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv"
         state: touch
 
     - name: create some test data
       shell: |
-        cat > "{{ csv_path }}/{{ csv_file }}.csv" << EOF
+        cat > "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv" << EOF
           Num,Check Item,Audit Value,Configuration Value,Result
           2.1.1,Ensure_mounting_of_cramfs_filesystems_is_disabled,no_output,Filesystem:cramfs module is loaded,Not Compliance,Medium
           2.1.1,Ensure_mounting_of_freevxfs_filesystems_is_disabled,no_output,Filesystem:freevxfs module is loaded,Not Compliance,Medium
