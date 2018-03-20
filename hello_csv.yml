@@ -17,6 +17,9 @@
         path: "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv"
         state: touch
 
+    - name: create file and dir use shell again
+      shell: mkdir -p "{{ csv_bash_path }}/{{ job_id }}" && touch "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv"
+
     - name: create some test data
       shell: |
         cat > "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv" << EOF
