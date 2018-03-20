@@ -2,6 +2,7 @@
   hosts: all
   vars:
    csv_bash_path: "/var/lib/awx/baselinecheck"
+   csv_temp_path: "/tmp/awx/baselinecheck"
   tasks:
     - name: Hello AWX and CSV
       debug:
@@ -9,20 +10,17 @@
 
     - name: create directory for csv
       file:
-        path: "{{ csv_bash_path }}/{{ job_id }}"
+        path: "{{ csv_temp_path }}/{{ job_id }}"
         state: directory
 
     - name: create csv file for test
       file:
-        path: "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv"
+        path: "{{ csv_temp_path }}/{{ job_id }}/{{ host_id }}.csv"
         state: touch
-
-    - name: create file and dir use shell again
-      shell: mkdir -p "{{ csv_bash_path }}/{{ job_id }}" && touch "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv"
 
     - name: create some test data
       shell: |
-        cat > "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv" << EOF
+        cat > "{{ csv_temp_path }}/{{ job_id }}/{{ host_id }}.csv" << EOF
           Num,Check Item,Audit Value,Configuration Value,Result
           2.1.1,Ensure_mounting_of_cramfs_filesystems_is_disabled,no_output,Filesystem:cramfs module is loaded,Not Compliance,Medium
           2.1.1,Ensure_mounting_of_freevxfs_filesystems_is_disabled,no_output,Filesystem:freevxfs module is loaded,Not Compliance,Medium
@@ -183,3 +181,9 @@
           6.4.3,Ensure default user umask is 027 or more restrictive,verify the UMASK are 027 or more restrictive,System UMASK is:0022,Not Compliance,High
           6.5,Ensure root login is restricted to system console,Remove entries for any consoles that are not in a physically secure location,console vc/1 vc/2 vc/3 vc/4 vc/5 vc/6 vc/7 vc/8 vc/9 vc/10 vc/11 tty1 tty2 tty3 tty4 tty5 tty6 tty7 tty8 tty9 tty10 tty11,Manual Check,High
           6.6,Ensure access to the su command is restricted,verify output includes matching line:auth required pam_wheel.so use_uid,#auth sufficient pam_wheel.so trust use_uid #auth required pam_wheel.so use_uid,Not Compliance,High
+
+    - name: copy csv file back
+      fetch:
+        src: "{{ csv_temp_path }}/{{ job_id }}/{{ host_id }}.csv"
+        dest: "{{ csv_bash_path }}/{{ job_id }}/{{ host_id }}.csv"
+        flat: yes
